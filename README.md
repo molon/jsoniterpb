@@ -1,13 +1,13 @@
 # jsoniterpb
 Replacement of Protojson over Jsoniter Extension
 
-#### Features
+### Features
 - Most of the features are the same as protojson
 - Support more fuzzy decode methods
 - Support for objects that do not implement `proto.Message`
 - better performance
 
-#### Warns
+### Warns
 - Only `proto3` is supported, `proto2` is not supported
 - `protojson` marshal nil `proto.Message` as zero value **if it is root**. but `jsoniterpb` will marshal it to `null`
 
@@ -16,7 +16,7 @@ Replacement of Protojson over Jsoniter Extension
   - Some error messages are not the same => Search `ErrMsgNotSame`
   - Some error check are not supported => Search `NotSupport`
 
-#### Usage
+### Usage
 ```
 // protojson.MarshalOptions{}
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
@@ -31,7 +31,7 @@ cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: false}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 ```
 
-#### Benchmark
+### Benchmark
 ```
 BenchmarkWrite/protojson
 BenchmarkWrite/protojson-8         	    4759	    251567 ns/op	  121746 B/op	    2380 allocs/op
