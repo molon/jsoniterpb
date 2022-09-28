@@ -7,17 +7,17 @@ Replacement of Protojson over Jsoniter Extension
 - Support for objects that do not implement `proto.Message`
 - better performance
 
-### Warns
-- Only `proto3` is supported, `proto2` is not supported
-- `protojson` marshal nil `proto.Message` as zero value **if it is root**. but `jsoniterpb` will marshal it to `null`
-
-- View [internal/protojson/tests/jsoniterpb_decode_test.go](internal/protojson/tests/jsoniterpb_decode_test.go)
-  - Support more fuzzy decode methods => Search `FuzzyDecode`
-  - Some error messages are not the same => Search `ErrMsgNotSame`
-  - Some error check are not supported => Search `NotSupport`
-
 ### Compatibility test
 `cd ./internal/protojson && go run ./gen.go`, it will download the latest tests file from `protocolbuffers/protobuf-go` and make it available to `jsoniterpb`
+
+### Warns
+Some differences with `protojson`
+- Only `proto3` is supported, `proto2` is not supported
+- `protojson` marshal nil `proto.Message` as zero value **if it is root**. but `jsoniterpb` will marshal it to `null`
+- View [internal/protojson/tests/jsoniterpb_decode_test.go](internal/protojson/tests/jsoniterpb_decode_test.go)
+  - Support more fuzzy decode methods => Search `FuzzyDecode`
+  - Most error messages are not the same => Search `ErrMsgNotSame`
+  - Some error check are not supported => Search `NotSupport`
 
 ### Usage
 ```
