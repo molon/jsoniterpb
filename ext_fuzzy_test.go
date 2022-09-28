@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	gofuzz "github.com/google/gofuzz"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/molon/jsoniterpb"
@@ -92,7 +93,7 @@ func FuzzReadWrite(f *testing.F) {
 			t.Fatal("unmarshal error: ", err)
 		}
 
-		if diff := cmp.Diff(&before, &after, protocmp.Transform()); diff != "" {
+		if diff := cmp.Diff(&before, &after, protocmp.Transform(), cmpopts.EquateNaNs()); diff != "" {
 			t.Errorf("before and after did not match:\n %s", diff)
 			t.Error(string(jsn))
 		}
@@ -120,7 +121,7 @@ func FuzzReadFromProtoJson(f *testing.F) {
 		if err != nil {
 			t.Fatal("unmarshal error: ", err)
 		}
-		if diff := cmp.Diff(&before, &after, protocmp.Transform()); diff != "" {
+		if diff := cmp.Diff(&before, &after, protocmp.Transform(), cmpopts.EquateNaNs()); diff != "" {
 			t.Error("before and after did not match", diff)
 			t.Error(string(jsonData))
 		}
@@ -148,7 +149,7 @@ func FuzzWriteToProtoJson(f *testing.F) {
 		if err := protojson.Unmarshal(jsn, &after); err != nil {
 			t.Fatal(err, string(jsn))
 		}
-		if diff := cmp.Diff(&before, &after, protocmp.Transform()); diff != "" {
+		if diff := cmp.Diff(&before, &after, protocmp.Transform(), cmpopts.EquateNaNs()); diff != "" {
 			t.Error("before and after did not match", diff)
 			t.Error(string(jsn))
 		}
