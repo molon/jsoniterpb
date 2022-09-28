@@ -20,6 +20,13 @@ Some differences with `protojson`
   - Some error check are not supported => Search `NotSupport`
 
 ### Usage
+Since the current extensibility of `https://github.com/json-iterator/go` is not enough to complete this project, it needs to be replaced with another version.
+```
+// go.mod 
+// go get github.com/molon/jsoniter@jsoniterpb
+replace github.com/json-iterator/go => github.com/molon/jsoniter v0.0.0-20220928114115-9bbeedd3bb95
+```
+
 ```
 // protojson.MarshalOptions{}
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()

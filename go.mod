@@ -20,4 +20,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/json-iterator/go => /Users/smile/go/src/github.com/molon/jsoniter
+// go get github.com/molon/jsoniter@jsoniterpb
+replace github.com/json-iterator/go => github.com/molon/jsoniter v0.0.0-20220928114115-9bbeedd3bb95
