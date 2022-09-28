@@ -16,6 +16,9 @@ Replacement of Protojson over Jsoniter Extension
   - Some error messages are not the same => Search `ErrMsgNotSame`
   - Some error check are not supported => Search `NotSupport`
 
+### Compatibility test
+`cd ./internal/protojson && go run ./gen.go`, it will download the latest tests file from `protocolbuffers/protobuf-go` and make it available to `jsoniterpb`
+
 ### Usage
 ```
 // protojson.MarshalOptions{}
@@ -30,9 +33,6 @@ cfg.RegisterExtension(&jsoniterpb.ProtoExtension{EmitUnpopulated: true})
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: false}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 ```
-
-### Compatibility test
-`cd ./internal/protojson && go run ./gen.go`, it will download the latest tests file from `protocolbuffers/protobuf-go` and make it available to `jsoniterpb`
 
 ### Benchmark
 ```
