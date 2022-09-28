@@ -1,0 +1,14 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/molon/jsoniterpb/internal/gen/go
+    except:
+      - buf.build/googleapis/googleapis
+plugins:
+  - remote: buf.build/protocolbuffers/plugins/go:v1.28.1-1
+    out: ../gen/go
+    opt: paths=source_relative
+  - name: gofuzz # go install github.com/srikrsna/goprotofuzz/cmd/protoc-gen-gofuzz@latest
+    opt: paths=source_relative
+    out: ../gen/go

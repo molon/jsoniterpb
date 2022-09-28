@@ -1,0 +1,282 @@
+syntax = "proto3";
+
+package test.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+
+message Message {
+  string id = 1;
+}
+
+message CaseValue {
+  google.protobuf.Value v = 1;
+  // google.protobuf.Struct s = 2;
+  // google.protobuf.ListValue l = 3;
+  google.protobuf.Any a = 4;
+  // repeated string strs = 1;
+  // repeated google.protobuf.NullValue nus = 2;
+  // repeated google.protobuf.Value vs = 3;
+}
+
+message Case {
+  google.protobuf.Int32Value wkt_i32_a = 1;
+  google.protobuf.Int32Value wkt_i32_b = 2;
+  optional int32 opt_i32_a = 3;
+  optional int32 opt_i32_b = 4;
+  optional google.protobuf.Int32Value opt_wkt_i32_a = 5;
+  optional google.protobuf.Int32Value opt_wkt_i32_b = 6;
+  repeated google.protobuf.Int32Value rpt_wkt_i32 = 7; 
+  map<string,google.protobuf.Int32Value> map_wkt_i32 = 8;
+
+  bytes b1 = 21;
+  bytes b2 = 22;
+  optional bytes opt_b1 = 23;
+  optional bytes opt_b2 = 24;
+  repeated bytes rpt_b = 25;
+  map<string,bytes> map_b = 26;
+
+  google.protobuf.BytesValue wkt_b1 = 31;
+  google.protobuf.BytesValue wkt_b2 = 32;
+  optional google.protobuf.BytesValue opt_wkt_b1 = 33;
+  optional google.protobuf.BytesValue opt_wkt_b2 = 34;
+  repeated google.protobuf.BytesValue rpt_wkt_b = 35;
+  map<string,google.protobuf.BytesValue> map_wkt_b = 36;
+
+  oneof one_of {
+    google.protobuf.Int32Value oneof_wkt_i32 = 9;
+    bytes oneof_b = 27;
+    google.protobuf.BytesValue oneof_wkt_b = 37;
+  }
+
+  repeated Message rpt_msg = 41;
+  map<string, Message> map_msg = 42;
+  map<string, JsonEnum> map_enum = 43;
+  map<uint64, google.protobuf.UInt64Value> map_wkt_u64 = 44;
+
+  google.protobuf.Value wkt_v = 51;
+  google.protobuf.Struct wkt_s = 52;
+  google.protobuf.ListValue wkt_lv = 53;
+  repeated google.protobuf.Value rpt_wkt_v = 54;
+  repeated google.protobuf.Struct rpt_wkt_s = 55;
+  repeated google.protobuf.ListValue rpt_wkt_lv = 56;
+}
+
+message All {
+  Repeated r = 1;
+  Singular s = 2;
+  OneOf o_f = 3;
+  JsonEnum e = 4;
+  OneOfWKT o_wkt = 5;
+  WKTs wkt = 6;    
+  Optionals o = 7;
+  RepeatedWKTs r_wkt = 8;
+  Nested n = 9;  
+  Map m = 10;
+  string snake_case = 11;
+  string lowerCamelCase = 12;
+  string UpwerCamelCase = 13;
+  OptionalWKTs opt_wkt = 14;
+}
+
+message Repeated {
+  repeated string s = 1;
+  repeated int32 i32 = 2;
+  repeated int64 i64 = 3;
+  repeated uint32 u32 = 4;
+  repeated uint64 u64 = 5;
+  repeated float f32 = 6;
+  repeated double f64 = 7;
+  repeated sint32 si32 = 8;
+  repeated sint64 si64 = 9;
+  repeated fixed32 fi32 = 10;
+  repeated fixed64 fi64 = 11;
+  repeated sfixed32 sfi32 = 12;
+  repeated sfixed64 sfi64 = 13;
+  repeated bool bl = 14;
+  repeated bytes by = 15;
+  repeated JsonEnum e = 16;
+  repeated Message msg = 17;
+}
+
+message Optionals {
+  optional string id = 1;
+  optional int32 i32 = 2;
+  optional int64 i64 = 3;
+  optional uint32 u32 = 4;
+  optional uint64 u64 = 5;
+  optional float f32 = 6;
+  optional double f64 = 7;
+  optional sint32 si32 = 8;
+  optional sint64 si64 = 9;
+  optional fixed32 fi32 = 10;
+  optional fixed64 fi64 = 11;
+  optional sfixed32 sfi32 = 12;
+  optional sfixed64 sfi64 = 13;
+  optional bool bl = 14;
+  optional bytes by = 15;
+  optional Message s = 16;
+  optional JsonEnum e = 17;
+}
+
+enum JsonEnum {
+  JSON_ENUM_UNSPECIFIED = 0;
+  JSON_ENUM_SOME = 1;
+}
+
+message WKTs {
+  google.protobuf.Any a = 1;
+  google.protobuf.Duration d = 2;
+  google.protobuf.Timestamp t = 3;
+  google.protobuf.Struct st = 4;
+  google.protobuf.Int32Value i32 = 5;
+  google.protobuf.UInt32Value ui32 = 7;
+  google.protobuf.Int64Value i64 = 8;
+  google.protobuf.UInt64Value u64 = 13;
+  google.protobuf.FloatValue f32 = 9;
+  google.protobuf.DoubleValue f64 = 10;
+  google.protobuf.BoolValue b = 11;
+  google.protobuf.StringValue s = 6;
+  google.protobuf.BytesValue by = 12;
+  google.protobuf.FieldMask fm = 14;
+  google.protobuf.Empty em = 15;
+  google.protobuf.NullValue nu = 16;
+  google.protobuf.Value v = 17;
+  google.protobuf.ListValue lv = 18;
+}
+
+message RepeatedWKTs {
+  repeated google.protobuf.Any a = 1;
+  repeated google.protobuf.Duration d = 2;
+  repeated google.protobuf.Timestamp t = 3;
+  repeated google.protobuf.Struct st = 4;
+  repeated google.protobuf.Int32Value i32 = 5;
+  repeated google.protobuf.UInt32Value ui32 = 7;
+  repeated google.protobuf.Int64Value i64 = 8;
+  repeated google.protobuf.UInt64Value u64 = 13;
+  repeated google.protobuf.FloatValue f32 = 9;
+  repeated google.protobuf.DoubleValue f64 = 10;
+  repeated google.protobuf.BoolValue b = 11;
+  repeated google.protobuf.StringValue s = 6;
+  repeated google.protobuf.BytesValue by = 12;
+  repeated google.protobuf.FieldMask fm = 14;
+  repeated google.protobuf.Empty em = 15;
+  repeated google.protobuf.NullValue nu = 16;
+  repeated google.protobuf.Value v = 17;
+  repeated google.protobuf.ListValue lv = 18;
+}
+
+
+message OptionalWKTs {
+  optional google.protobuf.Any a = 1;
+  optional google.protobuf.Duration d = 2;
+  optional google.protobuf.Timestamp t = 3;
+  optional google.protobuf.Struct st = 4;
+  optional google.protobuf.Int32Value i32 = 5;
+  optional google.protobuf.UInt32Value ui32 = 7;
+  optional google.protobuf.Int64Value i64 = 8;
+  optional google.protobuf.UInt64Value u64 = 13;
+  optional google.protobuf.FloatValue f32 = 9;
+  optional google.protobuf.DoubleValue f64 = 10;
+  optional google.protobuf.BoolValue b = 11;
+  optional google.protobuf.StringValue s = 6;
+  optional google.protobuf.BytesValue by = 12;
+  optional google.protobuf.FieldMask fm = 14;
+  optional google.protobuf.Empty em = 15;
+  optional google.protobuf.NullValue nu = 16;
+  optional google.protobuf.Value v = 17;
+  optional google.protobuf.ListValue lv = 18;
+}
+
+
+message OneOf {
+  string extra = 1;
+  oneof one_of {
+    JsonEnum e = 2;
+    string s_tr = 3;
+    int32 i32 = 4;
+    int64 i64 = 5;
+    uint32 u32 = 6;
+    uint64 u64 = 7;
+    float f32 = 8;
+    double f64 = 9;
+    sint32 si32 = 10;
+    sint64 si64 = 11;
+    fixed32 fi32 = 12;
+    fixed64 fi64 = 13;
+    sfixed32 sfi32 = 14;
+    sfixed64 sfi64 = 15;
+    bool bl = 16;
+    bytes by = 17;
+    Message msg = 28;
+  }
+}
+
+message OneOfWKT {
+  oneof one_of {
+    google.protobuf.Any a = 1;
+    google.protobuf.Duration d = 2;
+    google.protobuf.Timestamp t = 3;
+    google.protobuf.Struct st = 4;
+    google.protobuf.Int32Value i32 = 5;
+    google.protobuf.UInt32Value ui32 = 7;
+    google.protobuf.Int64Value i64 = 8;
+    google.protobuf.UInt64Value u64 = 13;
+    google.protobuf.FloatValue f32 = 9;
+    google.protobuf.DoubleValue f64 = 10;
+    google.protobuf.BoolValue b = 11;
+    google.protobuf.StringValue s = 6;
+    google.protobuf.BytesValue by = 12;
+    google.protobuf.FieldMask fm = 14;
+    google.protobuf.Empty em = 15;
+    google.protobuf.NullValue nu = 16;
+    google.protobuf.Value v = 17;
+    google.protobuf.ListValue lv = 18;
+  }
+}
+
+message Singular {
+  JsonEnum e = 2;
+  string s = 3;
+  int32 i32 = 4;
+  int64 i64 = 5;
+  uint32 u32 = 6;
+  uint64 u64 = 7;
+  float f32 = 8;
+  double f64 = 9;
+  sint32 si32 = 10;
+  sint64 si64 = 11;
+  fixed32 fi32 = 12;
+  fixed64 fi64 = 13;
+  sfixed32 sfi32 = 14;
+  sfixed64 sfi64 = 15;
+  bool bl = 16;
+  bytes by = 17;
+  Message msg = 18;
+}
+
+message Map {
+  map<string, JsonEnum> en = 1;
+  map<int32, Nested> msg = 2;
+  map<int64, string> str = 3;
+  map<bool, bytes> by = 4;
+  map<uint32, bool> bo = 5;
+  map<uint64, google.protobuf.Any> an = 6;
+  map<uint64, google.protobuf.UInt64Value> bn = 7;
+}
+
+message Nested {
+  message NestedMessage {
+    enum NestedEnum {
+      NESTED_ENUM_UNSPECIFIED = 0;
+    }
+    NestedEnum e = 1;
+  }
+  NestedMessage n = 2;
+}
