@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/modern-go/reflect2"
 	"github.com/molon/jsoniterpb"
@@ -37,7 +38,7 @@ func init() {
 func ProtoEqual(m, m2 proto.Message) bool {
 	// proto.Equal cant handle any.Any which contains map
 	// https://github.com/golang/protobuf/issues/455
-	return cmp.Diff(m, m2, protocmp.Transform()) == ""
+	return cmp.Diff(m, m2, protocmp.Transform(), cmpopts.EquateNaNs()) == ""
 }
 
 func pMarshalToStringWithOpts(opts protojson.MarshalOptions, m proto.Message) (string, error) {

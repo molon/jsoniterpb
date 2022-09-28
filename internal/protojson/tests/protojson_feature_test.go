@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	testv1 "github.com/molon/jsoniterpb/internal/gen/go/test/v1"
+	pb3 "github.com/molon/jsoniterpb/internal/protojson/textpb3"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -61,7 +63,7 @@ func TestPjNilValue(t *testing.T) {
 	var err error
 	var m proto.Message
 
-	// (Not Implement) marshal nil proto.Message to zero value if it is root
+	// marshal nil proto.Message to zero value if it is root (// TIPS: jsoniterpb does not support this feature)
 	jsn, err = pMarshalToStringWithOpts(euOpts, (*wrapperspb.Int32Value)(nil))
 	assert.Nil(t, err)
 	assert.Equal(t, `0`, jsn)
@@ -151,11 +153,6 @@ func TestPjWktValue(t *testing.T) {
 	assert.False(t, cmp.Diff(m, m2, protocmp.Transform()) == "")
 }
 
-// marshal bit 64 to string // TODO:
-// fuzzy decode string num // TODO:
-// dont marshal empty optional although EmitUnpopulated:true // TODO:
-// map key order // TODO:
-
 // marshal nan inf float to string
 func TestPjInfNaN(t *testing.T) {
 	jsn, err := pMarshalToString(&testv1.Singular{
@@ -173,10 +170,71 @@ func TestPjInfNaN(t *testing.T) {
 	assert.Equal(t, `{"f32":"Infinity","f64":"-Infinity"}`, jsn)
 }
 
+// marshal bit 64 to string
+func TestMarshal64BitInteger(t *testing.T) {
+	var jsn string
+	var err error
+
+	m := &testv1.Singular{I64: 123, U64: 234}
+	jsn, err = pMarshalToString(m)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"i64":"123","u64":"234"}`, jsn)
+}
+
+// fuzzy decode num
+func TestFuzzyDecode(t *testing.T) {
+	m := &pb3.Scalars{}
+	err := pUnmarshalFromString(`{
+		"sInt32": 1234,
+		"sInt64": -1234,
+		"sUint32": 1e2,
+		"sUint64": 100E-2,
+		"sSint32": 1.0,
+		"sSint64": -1.0,
+		"sFixed32": 1.234e+5,
+		"sFixed64": 1200E-2,
+		"sSfixed32": -1.234e05,
+		"sSfixed64": -1200e-02,
+		"sDouble": "123"
+	  }`, m)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(m, &pb3.Scalars{
+		SInt32:    1234,
+		SInt64:    -1234,
+		SUint32:   100,
+		SUint64:   1,
+		SSint32:   1,
+		SSint64:   -1,
+		SFixed32:  123400,
+		SFixed64:  12,
+		SSfixed32: -123400,
+		SSfixed64: -12,
+		SDouble:   123,
+	}))
+}
+
+func TestEmitUnpopulatedWithOptional(t *testing.T) {
+	var jsn string
+	var err error
+
+	m := &pb3.Proto3Optional{
+		OptInt64: proto.Int64(0),
+		OptInt32: proto.Int32(1),
+	}
+	// if opt is not nil, means it is not unpopulated although zero value
+	jsn, err = pMarshalToStringWithOpts(protojson.MarshalOptions{EmitUnpopulated: false}, m)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"optInt32":1,"optInt64":"0"}`, jsn)
+
+	// dont marshal nil optional although EmitUnpopulated:true
+	jsn, err = pMarshalToStringWithOpts(protojson.MarshalOptions{EmitUnpopulated: true}, m)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"optInt32":1,"optInt64":"0"}`, jsn)
+}
+
 // proto.Equal cant handle any.Any which contains map
 // https://github.com/golang/protobuf/issues/455
 // reason => https://github.com/golang/protobuf/commit/efcaa340c1a788c79e1ca31217d66aa41c405a51
-// But protocmp.Transform cant handle NaN value correctly
 func TestProtoEqualIssue(t *testing.T) {
 	var m, m2 proto.Message
 	var jsn string
@@ -196,18 +254,5 @@ func TestProtoEqualIssue(t *testing.T) {
 	err = pUnmarshalFromString(jsn, m2)
 	assert.Nil(t, err)
 	// assert.True(t, proto.Equal(m, m2)) // maybe false sometimes
-	assert.Equal(t, "", cmp.Diff(m, m2, protocmp.Transform()))
-
-	m = &testv1.Singular{
-		F32: float32(math.NaN()),
-		F64: math.NaN(),
-	}
-	jsn, err = pMarshalToString(m)
-	assert.Nil(t, err)
-	m2 = &testv1.Singular{}
-	err = pUnmarshalFromString(jsn, m2)
-	assert.Nil(t, err)
-	// https://github.com/golang/protobuf/issues/1489
-	// assert.Equal(t, "", cmp.Diff(m, m2, protocmp.Transform())) // not empty
-	assert.True(t, proto.Equal(m, m2))
+	assert.Equal(t, "", cmp.Diff(m, m2, protocmp.Transform(), cmpopts.EquateNaNs()))
 }
