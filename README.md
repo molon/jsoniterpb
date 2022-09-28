@@ -3,9 +3,9 @@ Replacement of Protojson over Jsoniter Extension
 
 ### Features
 - Most of the features are the same as protojson
-- Support more fuzzy decode methods
 - Support for objects that do not implement `proto.Message`
-- better performance
+- Support more fuzzy decode methods
+- Better performance
 
 ### Compatibility test
 `cd ./internal/protojson && go run ./gen.go`, it will download the latest tests file from `protocolbuffers/protobuf-go` and make it available to `jsoniterpb`
