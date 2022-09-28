@@ -20,7 +20,7 @@ Some differences with `protojson`
   - Some error check are not supported => Search `NotSupport`
 
 ### Usage
-Since the current extensibility of `https://github.com/json-iterator/go` is not enough to complete this project, it needs to be replaced with another version.
+Since the current extensibility of [json-iterator/go](https://github.com/json-iterator/go) is not enough to complete this project, it needs to be replaced with another version.
 ```
 // go.mod 
 // go get github.com/molon/jsoniter@jsoniterpb
