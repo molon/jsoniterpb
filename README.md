@@ -31,6 +31,9 @@ cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: false}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 ```
 
+### Compatibility test
+`cd ./internal/protojson && go run ./gen.go`, it will download the latest tests file from `protocolbuffers/protobuf-go` and make it available to `jsoniterpb`
+
 ### Benchmark
 ```
 BenchmarkWrite/protojson
