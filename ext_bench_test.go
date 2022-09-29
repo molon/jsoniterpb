@@ -1,7 +1,6 @@
 package jsoniterpb_test
 
 import (
-	"math/rand"
 	"testing"
 
 	gofuzz "github.com/google/gofuzz"
@@ -24,7 +23,7 @@ func BenchmarkWrite(b *testing.B) {
 	b.ResetTimer()
 	b.Run("protojson", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			m := ms[rand.Intn(len(ms))]
+			m := ms[i%len(ms)]
 			_, err := protojson.Marshal(m)
 			if err != nil {
 				b.Fatal(err)
@@ -36,7 +35,7 @@ func BenchmarkWrite(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 	b.Run("jsoniter", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			m := ms[rand.Intn(len(ms))]
+			m := ms[i%len(ms)]
 			_, err := cfg.Marshal(m)
 			if err != nil {
 				b.Fatal(err)
@@ -48,7 +47,7 @@ func BenchmarkWrite(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
 	b.Run("jsoniter-fast", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			m := ms[rand.Intn(len(ms))]
+			m := ms[i%len(ms)]
 			_, err := cfg.Marshal(m)
 			if err != nil {
 				b.Fatal(err)
@@ -59,7 +58,7 @@ func BenchmarkWrite(b *testing.B) {
 	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
 	b.Run("jsoniter-noext", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			m := ms[rand.Intn(len(ms))]
+			m := ms[i%len(ms)]
 			_, err := cfg.Marshal(m)
 			if err != nil {
 				b.Fatal(err)
@@ -83,7 +82,7 @@ func BenchmarkRead(b *testing.B) {
 	b.ResetTimer()
 	b.Run("protojson", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			buffer := buffers[rand.Intn(len(buffers))]
+			buffer := buffers[i%len(buffers)]
 			err := protojson.Unmarshal(buffer, &all)
 			if err != nil {
 				b.Fatal(err)
@@ -95,7 +94,7 @@ func BenchmarkRead(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 	b.Run("jsoniter", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			buffer := buffers[rand.Intn(len(buffers))]
+			buffer := buffers[i%len(buffers)]
 			err := cfg.Unmarshal(buffer, &all)
 			if err != nil {
 				b.Fatal(err)
@@ -107,7 +106,7 @@ func BenchmarkRead(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
 	b.Run("jsoniter-fast", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			buffer := buffers[rand.Intn(len(buffers))]
+			buffer := buffers[i%len(buffers)]
 			err := cfg.Unmarshal(buffer, &all)
 			if err != nil {
 				b.Fatal(err)
@@ -119,7 +118,7 @@ func BenchmarkRead(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{DisableFuzzyDecode: true})
 	b.Run("jsoniter-nofuzzydecode", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			buffer := buffers[rand.Intn(len(buffers))]
+			buffer := buffers[i%len(buffers)]
 			err := cfg.Unmarshal(buffer, &all)
 			if err != nil {
 				b.Fatal(err)
@@ -131,7 +130,7 @@ func BenchmarkRead(b *testing.B) {
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true, DisableFuzzyDecode: true})
 	b.Run("jsoniter-fast-nofuzzydecode", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			buffer := buffers[rand.Intn(len(buffers))]
+			buffer := buffers[i%len(buffers)]
 			err := cfg.Unmarshal(buffer, &all)
 			if err != nil {
 				b.Fatal(err)
