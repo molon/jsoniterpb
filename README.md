@@ -43,22 +43,32 @@ cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 
 ### Benchmark
 ```
+goos: darwin
+goarch: arm64
+pkg: github.com/molon/jsoniterpb
+BenchmarkWrite
 BenchmarkWrite/protojson
-BenchmarkWrite/protojson-8         	    4759	    251567 ns/op	  121746 B/op	    2380 allocs/op
+BenchmarkWrite/protojson-8                  4699            256354 ns/op          118876 B/op       2371 allocs/op
 BenchmarkWrite/jsoniter
-BenchmarkWrite/jsoniter-8          	    6506	    177602 ns/op	   88752 B/op	    2322 allocs/op
+BenchmarkWrite/jsoniter-8                   6052            185370 ns/op           88997 B/op       2327 allocs/op
 BenchmarkWrite/jsoniter-fast
-BenchmarkWrite/jsoniter-fast-8     	   10000	    112298 ns/op	   48103 B/op	    1150 allocs/op
+BenchmarkWrite/jsoniter-fast-8             10000            115706 ns/op           48134 B/op       1150 allocs/op
+BenchmarkWrite/jsoniter-noext
+BenchmarkWrite/jsoniter-noext-8            13857             85909 ns/op           41894 B/op        517 allocs/op
 ```
 ```
+goos: darwin
+goarch: arm64
+pkg: github.com/molon/jsoniterpb
+BenchmarkRead
 BenchmarkRead/protojson
-BenchmarkRead/protojson-8                   3120            384538 ns/op          115852 B/op       4137 allocs/op
+BenchmarkRead/protojson-8                   3168            380545 ns/op          116098 B/op       4146 allocs/op
 BenchmarkRead/jsoniter
-BenchmarkRead/jsoniter-8                    5943            200014 ns/op           87369 B/op       2787 allocs/op
+BenchmarkRead/jsoniter-8                    5809            203376 ns/op           87670 B/op       2793 allocs/op
 BenchmarkRead/jsoniter-fast
-BenchmarkRead/jsoniter-fast-8               6291            193630 ns/op           87441 B/op       2781 allocs/op
+BenchmarkRead/jsoniter-fast-8               6332            193698 ns/op           87154 B/op       2780 allocs/op
 BenchmarkRead/jsoniter-nofuzzydecode
-BenchmarkRead/jsoniter-nofuzzydecode-8              6241            174049 ns/op           74271 B/op       2167 allocs/op
+BenchmarkRead/jsoniter-nofuzzydecode-8              6721            177525 ns/op           75400 B/op       2189 allocs/op
 BenchmarkRead/jsoniter-fast-nofuzzydecode
-BenchmarkRead/jsoniter-fast-nofuzzydecode-8         6708            166749 ns/op           74963 B/op       2172 allocs/op
+BenchmarkRead/jsoniter-fast-nofuzzydecode-8         7183            166601 ns/op           75145 B/op       2178 allocs/op
 ```
