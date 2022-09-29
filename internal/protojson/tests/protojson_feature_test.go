@@ -232,6 +232,23 @@ func TestEmitUnpopulatedWithOptional(t *testing.T) {
 	assert.Equal(t, `{"optInt32":1,"optInt64":"0"}`, jsn)
 }
 
+func TestInvalidUTF8(t *testing.T) {
+	var m proto.Message
+	var jsn string
+	var err error
+
+	m = &testv1.Singular{S: "\xff"}
+
+	// can not marshal invalid utf8
+	jsn, err = pMarshalToString(m)
+	assert.Contains(t, err.Error(), "invalid UTF-8")
+
+	// can not unmarshal invalid utf8
+	jsn = `{"s":"` + "abc\xff" + `"}`
+	err = pUnmarshalFromString(jsn, m)
+	assert.Contains(t, err.Error(), "invalid UTF-8")
+}
+
 // proto.Equal cant handle any.Any which contains map
 // https://github.com/golang/protobuf/issues/455
 // reason => https://github.com/golang/protobuf/commit/efcaa340c1a788c79e1ca31217d66aa41c405a51
