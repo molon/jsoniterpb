@@ -3,7 +3,7 @@ Replacement of Protojson over Jsoniter Extension
 
 ### Features
 - Handle any type of object, not just `proto.Message`, to get a consistent format even with nested uses
-- Most of the features are the same as `protojson`, like `ProtobufWellKnownType/Oneof/JsonName/64IntToStr/CheckUT8/...`
+- All features of `protojson`, like `ProtobufWellKnownType/Oneof/JsonName/64IntToStr/SortMapKeysByRealValue/CheckUT8/...`
 - Support more fuzzy decode methods
 - Better performance
 
