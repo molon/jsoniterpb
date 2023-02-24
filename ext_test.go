@@ -63,39 +63,39 @@ func pUnmarshalFromString(s string, m proto.Message) error {
 	return protojson.Unmarshal([]byte(s), m)
 }
 
-func commonCheckMarshalEqual(t *testing.T, cfg jsoniter.API, opts *protojson.MarshalOptions, m proto.Message) (string, string) {
+func commonCheckMarshalEqual(t *testing.T, cfg jsoniter.API, opts *protojson.MarshalOptions, m proto.Message) string {
 	if opts == nil {
 		opts = &protojson.MarshalOptions{}
 	}
 
-	var err error
-	var jsnA, jsnB string
+	jsnExpect, err := pMarshalToStringWithOpts(*opts, m)
+	assert.Nil(t, err)
 
-	jsnA, err = cfg.MarshalToString(m)
+	jsnActual, err := cfg.MarshalToString(m)
 	assert.Nil(t, err)
-	jsnB, err = pMarshalToStringWithOpts(*opts, m)
-	assert.Nil(t, err)
-	assert.Equal(t, jsnA, jsnB)
-	// log.Println(jsnA)
-	return jsnA, jsnB
+
+	assert.Equal(t, jsnExpect, jsnActual)
+	return jsnExpect
 }
 
-func commonCheck(t *testing.T, cfg jsoniter.API, opts *protojson.MarshalOptions, m proto.Message) (string, string) {
-	jsnA, jsnB := commonCheckMarshalEqual(t, cfg, opts, m)
+func commonCheck(t *testing.T, cfg jsoniter.API, opts *protojson.MarshalOptions, m proto.Message) string {
+	jsn := commonCheckMarshalEqual(t, cfg, opts, m)
 
 	m2 := proto.Clone(m)
-	err := cfg.UnmarshalFromString(jsnA, m2)
+	err := cfg.UnmarshalFromString(jsn, m2)
 	assert.Nil(t, err)
+
 	// TIPS: If you have operated on m, such as `Clone` `protojson.Marshal`, etc., you cant use assert.Equal(t,m,m2) to check equality
+	// cmp.Diff(m, m2, protocmp.Transform()) works in all cases
 	assert.Equal(t, "", cmp.Diff(m, m2, protocmp.Transform()))
 	// assert.True(t, proto.Equal(m, m2))
 
 	m2 = proto.Clone(m)
-	err = pUnmarshalFromString(jsnB, m2)
+	err = pUnmarshalFromString(jsn, m2)
 	assert.Nil(t, err)
 	assert.Equal(t, "", cmp.Diff(m, m2, protocmp.Transform()))
 
-	return jsnA, jsnB
+	return jsn
 }
 
 func TestJsonName(t *testing.T) {
@@ -226,19 +226,13 @@ func TestScalar(t *testing.T) {
 	assert.Equal(t, float32(123.1), mm.F32.GetValue())
 	assert.Equal(t, float64(234.5), mm.F64.GetValue())
 
+	// invalid utf8
 	vv := &wrapperspb.StringValue{Value: "abc\xff"}
 	_, err = cfg.MarshalToString(vv)
 	assert.Contains(t, err.Error(), "invalid UTF-8")
 
+	// complex str
 	commonCheck(t, cfg, nil, &wrapperspb.StringValue{Value: "\u0000\u0008\u2028\"\\/\b\f\n\r\t你好啊朋友"})
-
-	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
-	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{
-		PermitInvalidUTF8: true,
-	})
-	jsn, err := cfg.MarshalToString(&wrapperspb.StringValue{Value: "abc\xff"})
-	assert.Nil(t, err)
-	assert.Equal(t, "\"abc\xff\"", jsn)
 }
 
 func TestEmitUnpopulated(t *testing.T) {
@@ -370,7 +364,7 @@ func TestNullValue(t *testing.T) {
 			V:  structpb.NewNullValue(),
 		},
 	}
-	jsn, _ = commonCheck(t, cfg, nil, m)
+	jsn = commonCheck(t, cfg, nil, m)
 	m2 := &testv1.All{}
 	err = cfg.UnmarshalFromString(jsn, m2)
 	assert.Nil(t, err)
@@ -384,7 +378,7 @@ func TestNullValue(t *testing.T) {
 	m.OWkt.OneOf = &testv1.OneOfWKT_V{
 		V: structpb.NewNullValue(),
 	}
-	jsn, _ = commonCheck(t, cfg, nil, m)
+	jsn = commonCheck(t, cfg, nil, m)
 	m2 = &testv1.All{}
 	err = cfg.UnmarshalFromString(jsn, m2)
 	assert.Nil(t, err)
@@ -586,6 +580,34 @@ func TestSortMapKeys(t *testing.T) {
 	jsn, err := cfg.MarshalToString(m)
 	assert.Nil(t, err)
 	assert.Equal(t, `{"str":{"-1":"b","-2":"a","-3":"c"},"by":{"false":"Yg==","true":"YQ=="},"bo":{"10":false,"188":true,"20":true}}`, jsn)
+
+	// nesting, check whether the internal and external are consistent
+	m2 := struct {
+		Pb  *testv1.Map      `json:"pb"`
+		Str map[int64]string `json:"str"`
+		By  map[bool][]byte  `json:"by"`
+		Bo  map[uint32]bool  `json:"bo"`
+	}{
+		Pb:  m,
+		Str: map[int64]string{-2: "a", -1: "b", -3: "c"},
+		By:  map[bool][]byte{true: []byte(`a`), false: []byte(`b`)},
+		Bo:  map[uint32]bool{10: false, 20: true, 188: true},
+	}
+	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{
+		SortMapKeysAsString: false,
+	})
+	jsn, err = cfg.MarshalToString(m2)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"pb":{"str":{"-3":"c","-2":"a","-1":"b"},"by":{"false":"Yg==","true":"YQ=="},"bo":{"10":false,"20":true,"188":true}},"str":{"-3":"c","-2":"a","-1":"b"},"by":{"false":"Yg==","true":"YQ=="},"bo":{"10":false,"20":true,"188":true}}`, jsn)
+
+	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{
+		SortMapKeysAsString: true,
+	})
+	jsn, err = cfg.MarshalToString(m2)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"pb":{"str":{"-1":"b","-2":"a","-3":"c"},"by":{"false":"Yg==","true":"YQ=="},"bo":{"10":false,"188":true,"20":true}},"str":{"-1":"b","-2":"a","-3":"c"},"by":{"false":"Yg==","true":"YQ=="},"bo":{"10":false,"188":true,"20":true}}`, jsn)
 }
 
 func TestOneof(t *testing.T) {
@@ -845,7 +867,7 @@ func TestOptionals(t *testing.T) {
 
 	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{EmitUnpopulated: true})
-	jsn, _ := commonCheck(t, cfg, &protojson.MarshalOptions{EmitUnpopulated: true}, &testv1.Optionals{})
+	jsn := commonCheck(t, cfg, &protojson.MarshalOptions{EmitUnpopulated: true}, &testv1.Optionals{})
 	assert.Equal(t, "{}", jsn)
 }
 
@@ -853,22 +875,79 @@ func TestEscapeHTML(t *testing.T) {
 	var jsn string
 	var err error
 
-	s := "\u0000\u0008\u2028\"\\/\b\f\n\r\t你好啊朋友"
-	invalidS := "contains invalid utf8 \xff"
+	s := &testv1.Singular{
+		S: "\u0000\u0008\u2028\"\\/\b\f\n\r\t你好啊朋友",
+	}
 
 	cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
-	jsn, err = cfg.MarshalToString(s)
-	assert.Nil(t, err)
-	assert.Equal(t, `"\u0000\b \"\\/\b\f\n\r\t你好啊朋友"`, jsn)
-	jsn, err = cfg.MarshalToString(invalidS)
-	assert.Contains(t, err.Error(), `invalid UTF-8`)
+	jsn = commonCheck(t, cfg, nil, s) // protojson default == (EscapeHTML:false)
+	assert.Equal(t, `{"s":"\u0000\b \"\\/\b\f\n\r\t你好啊朋友"}`, jsn)
 
 	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true, EscapeHTML: true}.Froze()
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 	jsn, err = cfg.MarshalToString(s)
 	assert.Nil(t, err)
-	assert.Equal(t, `"\u0000\b\u2028\"\\/\b\f\n\r\t你好啊朋友"`, jsn)
+	assert.Equal(t, `{"s":"\u0000\b\u2028\"\\/\b\f\n\r\t你好啊朋友"}`, jsn)
+}
+
+func TestPermitInvalidUTF8(t *testing.T) {
+	var jsn string
+	var err error
+
+	invalidS := "contains invalid utf8 \xff"
+
+	cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 	jsn, err = cfg.MarshalToString(invalidS)
 	assert.Contains(t, err.Error(), `invalid UTF-8`)
+
+	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
+	jsn, err = cfg.MarshalToString(invalidS)
+	assert.Nil(t, err)
+	assert.Equal(t, `"`+invalidS+`"`, jsn)
+}
+
+func TestEncode64BitAsInteger(t *testing.T) {
+	var jsn string
+	var err error
+	m := &testv1.All{
+		S: &testv1.Singular{
+			I64: -123123123123123123,
+			U64: 12312312321312312,
+		},
+	}
+
+	// marshal to non-str if ProtoExtension not set
+	cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	jsn, err = cfg.MarshalToString(m)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"s":{"i64":-123123123123123123,"u64":12312312321312312}}`, jsn)
+
+	// marshal to str if ProtoExtension set
+	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{Encode64BitAsInteger: false})
+	jsn, err = cfg.MarshalToString(m)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"s":{"i64":"-123123123123123123","u64":"12312312321312312"}}`, jsn)
+
+	// marshal to str although the outer is not proto.Message
+	m2 := struct {
+		Inner  *testv1.All `json:"inner"`
+		OutI64 int64       `json:"outI64"`
+	}{
+		Inner:  m,
+		OutI64: -25252525252525,
+	}
+	jsn, err = cfg.MarshalToString(m2)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"inner":{"s":{"i64":"-123123123123123123","u64":"12312312321312312"}},"outI64":"-25252525252525"}`, jsn)
+
+	// marshal to non-str if Encode64BitAsInteger is true
+	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{Encode64BitAsInteger: true})
+	jsn, err = cfg.MarshalToString(m2)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"inner":{"s":{"i64":-123123123123123123,"u64":12312312321312312}},"outI64":-25252525252525}`, jsn)
 }

@@ -44,7 +44,7 @@ func BenchmarkWrite(b *testing.B) {
 	})
 
 	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
-	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{SortMapKeysAsString: true, PermitInvalidUTF8: true})
 	b.Run("jsoniter-fast", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			m := ms[i%len(ms)]
