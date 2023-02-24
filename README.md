@@ -2,8 +2,8 @@
 Replacement of Protojson over Jsoniter Extension
 
 ### Features
-- Most of the features are the same as protojson
-- Support for objects that do not implement `proto.Message`
+- Handle any type of object, not just `proto.Message`, to get a consistent format even with nested uses
+- Most of the features are the same as `protojson`, like `oneof/jsonName/64intToStr/CheckUT8/...`
 - Support more fuzzy decode methods
 - Better performance
 
@@ -28,15 +28,15 @@ replace github.com/json-iterator/go => github.com/molon/jsoniter v0.0.0-20220928
 ```
 
 ```
-// protojson.MarshalOptions{}
+// protojson.MarshalOptions{} equals
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 
-// protojson.MarshalOptions{EmitUnpopulated: true}
+// protojson.MarshalOptions{EmitUnpopulated: true} equals
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{EmitUnpopulated: true})
 
-// protojson.UnmarshalOptions{DiscardUnknown: true}
+// protojson.UnmarshalOptions{DiscardUnknown: true} equals
 cfg := jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: false}.Froze()
 cfg.RegisterExtension(&jsoniterpb.ProtoExtension{})
 ```
