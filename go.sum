@@ -14,8 +14,8 @@ github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 h1:ZqeYNhU3OH
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
-github.com/molon/jsoniter v0.0.0-20220928114115-9bbeedd3bb95 h1:mFaYecw0j/kNM/o1ebe/he/Mozed+5NLm95xsNtqph4=
-github.com/molon/jsoniter v0.0.0-20220928114115-9bbeedd3bb95/go.mod h1:TBzl5BIHNXfS9+C35ZyJaklL7mLDbgUkcgXzSLa8Tk0=
+github.com/molon/jsoniter v0.0.0-20230305181513-eac2ab4f5edf h1:pWqCQ76/mRFlP6Z3HykGXw5lasp2n17ibM0NdbnbWYg=
+github.com/molon/jsoniter v0.0.0-20230305181513-eac2ab4f5edf/go.mod h1:TBzl5BIHNXfS9+C35ZyJaklL7mLDbgUkcgXzSLa8Tk0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/srikrsna/goprotofuzz v0.0.0-20220606153644-8d0e21b5787a h1:CCrdzApw1Ppmm4a5VR6ESu5uirs9dwtWhs/+CB3Jrhk=

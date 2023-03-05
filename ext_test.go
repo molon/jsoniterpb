@@ -954,16 +954,17 @@ func TestEncode64BitAsInteger(t *testing.T) {
 	// marshal sth with Int64Wrapper to test whether quote it repeatedly
 	type Int64Wrapper int64
 	x := struct {
-		Int64     int64
+		Int64     int64 `json:"Int64,string"`
 		Int64Arr  []int64
 		Int64Map  map[int64]int64
-		Int64W    Int64Wrapper
+		Int64W    Int64Wrapper `json:"Int64W,string"`
 		Int64WArr []Int64Wrapper
 		Int64WMap map[Int64Wrapper]Int64Wrapper
 		I2W       map[int64]Int64Wrapper
 		W2I       map[Int64Wrapper]int64
 		S2I       map[string]int64
 		S2W       map[string]Int64Wrapper
+		Str       string `json:"Str,string"`
 	}{
 		Int64:     123456,
 		Int64Arr:  []int64{1, 2, 3},
@@ -975,10 +976,11 @@ func TestEncode64BitAsInteger(t *testing.T) {
 		W2I:       map[Int64Wrapper]int64{1: 1},
 		S2I:       map[string]int64{"1": 1},
 		S2W:       map[string]Int64Wrapper{"1": 1},
+		Str:       "this is a str",
 	}
 	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{Encode64BitAsInteger: false})
 	jsn, err = cfg.MarshalToString(x)
 	assert.Nil(t, err)
-	assert.Equal(t, `{"Int64":"123456","Int64Arr":["1","2","3"],"Int64Map":{"1":"1","2":"2"},"Int64W":"123456","Int64WArr":["1","2","3"],"Int64WMap":{"1":"1","2":"2"},"I2W":{"1":"1"},"W2I":{"1":"1"},"S2I":{"1":"1"},"S2W":{"1":"1"}}`, jsn)
+	assert.Equal(t, `{"Int64":"123456","Int64Arr":["1","2","3"],"Int64Map":{"1":"1","2":"2"},"Int64W":"123456","Int64WArr":["1","2","3"],"Int64WMap":{"1":"1","2":"2"},"I2W":{"1":"1"},"W2I":{"1":"1"},"S2I":{"1":"1"},"S2W":{"1":"1"},"Str":"\"this is a str\""}`, jsn)
 }
