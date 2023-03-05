@@ -16,9 +16,18 @@ type stringModeNumberEncoder struct {
 var singleQuote = []byte{'"'}
 
 func (encoder *stringModeNumberEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
-	stream.Write(singleQuote)
-	encoder.elemEncoder.Encode(ptr, stream)
-	stream.Write(singleQuote)
+	tempStream := stream.API().BorrowStream(nil)
+	tempStream.Attachment = stream.Attachment
+	defer stream.API().ReturnStream(tempStream)
+	encoder.elemEncoder.Encode(ptr, tempStream)
+	buf := tempStream.Buffer()
+	if len(buf) >= 2 && buf[0] == '"' && buf[len(buf)-1] == '"' {
+		stream.Write(buf)
+	} else {
+		stream.Write(singleQuote)
+		stream.Write(buf)
+		stream.Write(singleQuote)
+	}
 }
 
 func (encoder *stringModeNumberEncoder) IsEmpty(ptr unsafe.Pointer) bool {
