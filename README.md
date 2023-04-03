@@ -48,13 +48,11 @@ goarch: arm64
 pkg: github.com/molon/jsoniterpb
 BenchmarkWrite
 BenchmarkWrite/protojson
-BenchmarkWrite/protojson-8                  4699            256354 ns/op          118876 B/op       2371 allocs/op
+BenchmarkWrite/protojson-8         	    4590	    252336 ns/op	  120711 B/op	    2360 allocs/op
 BenchmarkWrite/jsoniter
-BenchmarkWrite/jsoniter-8                   6052            185370 ns/op           88997 B/op       2327 allocs/op
+BenchmarkWrite/jsoniter-8          	    6589	    188076 ns/op	   88383 B/op	    2313 allocs/op
 BenchmarkWrite/jsoniter-fast
-BenchmarkWrite/jsoniter-fast-8             10000            115706 ns/op           48134 B/op       1150 allocs/op
-BenchmarkWrite/jsoniter-noext
-BenchmarkWrite/jsoniter-noext-8            13857             85909 ns/op           41894 B/op        517 allocs/op
+BenchmarkWrite/jsoniter-fast-8     	   10000	    119375 ns/op	   47925 B/op	    1146 allocs/op
 ```
 ```
 goos: darwin
@@ -62,13 +60,9 @@ goarch: arm64
 pkg: github.com/molon/jsoniterpb
 BenchmarkRead
 BenchmarkRead/protojson
-BenchmarkRead/protojson-8                   3168            380545 ns/op          116098 B/op       4146 allocs/op
+BenchmarkRead/protojson-8         	    3328	    371155 ns/op	  113408 B/op	    4021 allocs/op
 BenchmarkRead/jsoniter
-BenchmarkRead/jsoniter-8                    5809            203376 ns/op           87670 B/op       2793 allocs/op
-BenchmarkRead/jsoniter-fast
-BenchmarkRead/jsoniter-fast-8               6332            193698 ns/op           87154 B/op       2780 allocs/op
+BenchmarkRead/jsoniter-8          	    5720	    204019 ns/op	   87803 B/op	    2790 allocs/op
 BenchmarkRead/jsoniter-nofuzzydecode
-BenchmarkRead/jsoniter-nofuzzydecode-8              6721            177525 ns/op           75400 B/op       2189 allocs/op
-BenchmarkRead/jsoniter-fast-nofuzzydecode
-BenchmarkRead/jsoniter-fast-nofuzzydecode-8         7183            166601 ns/op           75145 B/op       2178 allocs/op
+BenchmarkRead/jsoniter-nofuzzydecode-8         	    6697	    177609 ns/op	   75491 B/op	    2185 allocs/op
 ```

@@ -44,7 +44,7 @@ func BenchmarkWrite(b *testing.B) {
 	})
 
 	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
-	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{SortMapKeysAsString: true, PermitInvalidUTF8: true})
+	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
 	b.Run("jsoniter-fast", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			m := ms[i%len(ms)]
@@ -55,16 +55,16 @@ func BenchmarkWrite(b *testing.B) {
 		}
 	})
 
-	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
-	b.Run("jsoniter-noext", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			m := ms[i%len(ms)]
-			_, err := cfg.Marshal(m)
-			if err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
+	// cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
+	// b.Run("jsoniter-noext", func(b *testing.B) {
+	// 	for i := 0; i < b.N; i++ {
+	// 		m := ms[i%len(ms)]
+	// 		_, err := cfg.Marshal(m)
+	// 		if err != nil {
+	// 			b.Fatal(err)
+	// 		}
+	// 	}
+	// })
 }
 
 func BenchmarkRead(b *testing.B) {
@@ -102,33 +102,9 @@ func BenchmarkRead(b *testing.B) {
 		}
 	})
 
-	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
-	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true})
-	b.Run("jsoniter-fast", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			buffer := buffers[i%len(buffers)]
-			err := cfg.Unmarshal(buffer, &all)
-			if err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
 	cfg = jsoniter.Config{SortMapKeys: true, DisallowUnknownFields: true}.Froze()
 	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{DisableFuzzyDecode: true})
 	b.Run("jsoniter-nofuzzydecode", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			buffer := buffers[i%len(buffers)]
-			err := cfg.Unmarshal(buffer, &all)
-			if err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	cfg = jsoniter.Config{SortMapKeys: false, DisallowUnknownFields: false}.Froze()
-	cfg.RegisterExtension(&jsoniterpb.ProtoExtension{PermitInvalidUTF8: true, DisableFuzzyDecode: true})
-	b.Run("jsoniter-fast-nofuzzydecode", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			buffer := buffers[i%len(buffers)]
 			err := cfg.Unmarshal(buffer, &all)

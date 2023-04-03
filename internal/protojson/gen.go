@@ -163,6 +163,9 @@ func handleDecode() error {
 		}
 		return src
 	}, -1, -1)
+	if err != nil {
+		return err
+	}
 	f.Body = regexp.MustCompile(`import\s*\([^\)]+\)`).ReplaceAllString(f.Body,
 		`import (
 	"math"
