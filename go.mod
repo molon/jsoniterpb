@@ -21,4 +21,4 @@ require (
 )
 
 // go get github.com/molon/jsoniter@jsoniterpb
-replace github.com/json-iterator/go => github.com/molon/jsoniter v0.0.0-20230305181513-eac2ab4f5edf
+replace github.com/json-iterator/go => github.com/molon/jsoniter v0.0.0-20230529062209-e42e40bd8588
